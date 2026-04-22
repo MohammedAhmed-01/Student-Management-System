@@ -9,3 +9,5 @@ test_student_management.db
 .venv/
 .vscode/
 .idea/
+venv/
+.env
