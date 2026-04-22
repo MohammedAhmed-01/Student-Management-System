@@ -53,7 +53,8 @@ student-management-system/
 │   ├── models/               # Database models (SQLAlchemy)
 │   │   ├── user.py           # User model
 │   │   ├── student.py        # Student model
-│   │   └── audit_log.py      # Audit log model
+│   │   ├── audit_log.py      # Audit log model
+│   │   └── DataBaseQueries.sql   # Databasesetup_query
 │   │
 │   ├── schemas/              # Pydantic schemas (validation)
 │   │   ├── auth.py           # Login & register schemas
