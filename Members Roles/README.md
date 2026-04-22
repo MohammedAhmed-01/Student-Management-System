@@ -27,7 +27,7 @@ It includes authentication, role-based access control, student CRUD operations, 
 
 * FastAPI
 * SQLAlchemy
-* PostgreSQL / MySQL
+* MSSQL
 * Redis
 * Pytest
 * HTML / CSS / JavaScript (Frontend)
