@@ -1,26 +1,26 @@
 # app/schemas/student.py
+# Member 4 - Added PaginatedStudentResponse to existing schemas
+
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
-# ── Shared base ───────────────────────────────────────────────────────────────
-
 class StudentBase(BaseModel):
-    first_name:      str            = Field(..., min_length=1, max_length=100)
-    last_name:       str            = Field(..., min_length=1, max_length=100)
+    first_name:      str               = Field(..., min_length=1, max_length=100)
+    last_name:       str               = Field(..., min_length=1, max_length=100)
     email:           EmailStr
-    phone:           Optional[str]  = Field(None, max_length=20)
-    date_of_birth:   Optional[date] = None
-    gender:          Optional[str]  = Field(None, pattern="^(male|female|other)$")
-    department:      str            = Field(..., min_length=1, max_length=100)
-    major:           str            = Field(..., min_length=1, max_length=100)
-    enrollment_year: int            = Field(..., ge=2000, le=2100)
-    year_of_study:   int            = Field(..., ge=1, le=6)
+    phone:           Optional[str]     = Field(None, max_length=20)
+    date_of_birth:   Optional[date]    = None
+    gender:          Optional[str]     = Field(None, pattern="^(male|female|other)$")
+    department:      str               = Field(..., min_length=1, max_length=100)
+    major:           str               = Field(..., min_length=1, max_length=100)
+    enrollment_year: int               = Field(..., ge=2000, le=2100)
+    year_of_study:   int               = Field(..., ge=1, le=6)
     gpa:             Optional[Decimal] = Field(None, ge=0, le=4)
-    status:          Optional[str]  = Field("active", pattern="^(active|inactive|graduated)$")
-    address:         Optional[str]  = Field(None, max_length=500)
+    status:          Optional[str]     = Field("active", pattern="^(active|inactive|graduated)$")
+    address:         Optional[str]     = Field(None, max_length=500)
 
     @field_validator("first_name", "last_name", mode="before")
     @classmethod
@@ -28,35 +28,21 @@ class StudentBase(BaseModel):
         return v.strip()
 
 
-# ── Admin: Create a new student (requires user_id) ───────────────────────────
-
 class StudentCreate(StudentBase):
-    """Used by admin to create a student record linked to an existing user."""
     user_id: int
 
 
-# ── Admin: Full update ────────────────────────────────────────────────────────
-
 class StudentUpdate(StudentBase):
-    """Admin can update any field."""
     pass
 
 
-# ── Student: Partial self-update (only allowed fields) ───────────────────────
-
 class StudentSelfUpdate(BaseModel):
-    """
-    A student can only update their own contact info.
-    All fields are optional — only provided fields will be updated.
-    """
-    phone:         Optional[str]     = Field(None, max_length=20)
-    address:       Optional[str]     = Field(None, max_length=500)
-    email:         Optional[EmailStr] = None
+    phone:   Optional[str]      = Field(None, max_length=20)
+    address: Optional[str]      = Field(None, max_length=500)
+    email:   Optional[EmailStr] = None
 
-    model_config = {"extra": "forbid"}  # block attempts to sneak in other fields
+    model_config = {"extra": "forbid"}
 
-
-# ── Response model ────────────────────────────────────────────────────────────
 
 class StudentResponse(BaseModel):
     student_id:      int
@@ -77,4 +63,17 @@ class StudentResponse(BaseModel):
     created_at:      datetime
     updated_at:      Optional[datetime]
 
-    model_config = {"from_attributes": True}  # allows ORM → schema conversion
+    model_config = {"from_attributes": True}
+
+
+class PaginatedStudentResponse(BaseModel):
+    """
+    Paginated list of students returned by GET /api/students/
+    """
+    total:     int                   # Total matching students in DB
+    page:      int                   # Current page (1-indexed)
+    page_size: int                   # Records per page
+    pages:     int                   # Total number of pages
+    data:      List[StudentResponse] # Students on this page
+
+    model_config = {"from_attributes": True}
