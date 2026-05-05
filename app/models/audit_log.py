@@ -2,8 +2,7 @@ import json
 from sqlalchemy import BigInteger, Column, Integer, String, Text, DateTime, ForeignKey, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from core.database import Base
-
+from app.core.database import Base
 
 class AuditLog(Base):
     """Append-only audit trail. Never update or delete rows from this table."""

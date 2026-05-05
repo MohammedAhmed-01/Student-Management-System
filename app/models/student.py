@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, SmallInteger, String, Date, DateTime, ForeignKey, Numeric, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from core.database import Base
+from app.core.database import Base
 
 
 class Student(Base):
