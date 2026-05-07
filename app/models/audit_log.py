@@ -3,7 +3,6 @@ from sqlalchemy import BigInteger, Column, Integer, String, Text, DateTime, Fore
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.core.database import Base
-
 class AuditLog(Base):
     """Append-only audit trail. Never update or delete rows from this table."""
 
@@ -38,6 +37,7 @@ class AuditLog(Base):
 
     def get_new_value(self) -> dict | None:
         return json.loads(self.new_value) if self.new_value else None
+
 
     def __repr__(self) -> str:
         return f"<AuditLog id={self.log_id} action={self.action!r} student_id={self.student_id} at={self.timestamp}>"

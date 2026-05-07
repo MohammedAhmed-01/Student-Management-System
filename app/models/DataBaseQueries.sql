@@ -1,6 +1,5 @@
 -- ============================================================
 -- Student Management System — MSSQL Setup Script
--- Run in SSMS: Open file → F5
 -- Execution order: Database → Users → Students → AuditLogs → Indexes → Permissions
 -- ============================================================
 

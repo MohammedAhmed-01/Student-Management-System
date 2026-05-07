@@ -3,7 +3,6 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
-
 class Student(Base):
     __tablename__  = "Students"
     __table_args__ = (
