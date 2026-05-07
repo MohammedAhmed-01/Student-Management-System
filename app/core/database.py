@@ -69,7 +69,7 @@ if __name__ == "__main__":
     try:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT @@VERSION"))
-            print("✅  Connected to MSSQL:")
+            print(" Connected to MSSQL:")
             print(result.fetchone()[0])
     except Exception as exc:
-        print(f"❌  Connection failed: {exc}")
+        print(f"  Connection failed: {exc}")
