@@ -1,0 +1,17 @@
+front/
+node_modules/
+**/node_modules/
+.next/
+.git/
+.venv/
+__pycache__/
+.pytest_cache/
+tests/
+.env
+Dockerfile
+docker-compose.yml
+README.md
+docs/
+scripts/
+*.zip
+*.exe

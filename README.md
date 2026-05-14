@@ -98,7 +98,6 @@ student-management-api/
 ├── frontend/                     # Next.js frontend application
 ├── docs/                         # Project documentation & API spec
 ├── docker-compose.yml            # Full-stack Docker orchestration
-├──.gitignore
 └── README.md
 ```
 

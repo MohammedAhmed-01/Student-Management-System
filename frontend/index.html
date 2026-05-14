@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- ==================== Auth (login / register) ==================== -->
+    <div id="view-auth" class="auth-layout">
+      <div class="auth-brand">
+        <div class="auth-brand__logo">SMS</div>
+        <h1 class="auth-brand__title">Student Management</h1>
+        <p class="auth-brand__tagline">Sign in to access your dashboard.</p>
+      </div>
+
+      <div class="auth-panels">
+        <!-- Login -->
+        <section id="section-login" class="auth-card">
+          <h2 class="auth-card__heading">Welcome back</h2>
+          <p class="text-muted text-sm">Use the account created for this API.</p>
+          <div id="alert-login" class="alert hidden" role="alert"></div>
+          <form id="form-login" class="form-stack" novalidate>
+            <div class="field">
+              <label class="field__label" for="login-email">Email</label>
+              <input
+                id="login-email"
+                class="field__input"
+                type="email"
+                autocomplete="username"
+                required
+              />
+            </div>
+            <div class="field">
+              <label class="field__label" for="login-password">Password</label>
+              <input
+                id="login-password"
+                class="field__input"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn--primary btn--block">Log in</button>
+          </form>
+          <p class="auth-switch">
+            New here?
+            <button type="button" class="link-btn" id="btn-goto-register">Create an account</button>
+          </p>
+        </section>
+
+        <!-- Register -->
+        <section id="section-register" class="auth-card hidden">
+          <h2 class="auth-card__heading">Create account</h2>
+          <p class="text-muted text-sm">
+            <strong>Note:</strong> <code>POST /auth/register</code> always creates a
+            <strong>student</strong> user on this backend. Admin accounts must be created by an
+            existing administrator (<code>POST /users/</code>).
+          </p>
+          <div id="alert-register" class="alert hidden" role="alert"></div>
+          <form id="form-register" class="form-stack" novalidate>
+            <div class="field">
+              <label class="field__label" for="reg-full-name">Full name</label>
+              <input id="reg-full-name" class="field__input" type="text" required />
+            </div>
+            <div class="field">
+              <label class="field__label" for="reg-email">Email</label>
+              <input id="reg-email" class="field__input" type="email" autocomplete="email" required />
+            </div>
+            <div class="field">
+              <label class="field__label" for="reg-password">Password</label>
+              <input
+                id="reg-password"
+                class="field__input"
+                type="password"
+                autocomplete="new-password"
+                required
+              />
+            </div>
+            <div class="field">
+              <label class="field__label" for="reg-role">Role (informational)</label>
+              <select id="reg-role" class="field__input">
+                <option value="student">Student (public sign-up)</option>
+                <option value="admin">Admin (not available via public register)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block">Register</button>
+          </form>
+          <p class="auth-switch">
+            Already have an account?
+            <button type="button" class="link-btn" id="btn-goto-login">Back to login</button>
+          </p>
+        </section>
+      </div>
+    </div>
+
+    <!-- ==================== App shell ==================== -->
+    <div id="view-app" class="app-shell hidden">
+      <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+        <div class="sidebar__brand">
+          <span class="sidebar__mark">SMS</span>
+          <span class="sidebar__name">Admin</span>
+        </div>
+        <nav class="sidebar__nav">
+          <button type="button" class="nav-item is-active" data-section="dashboard">
+            <span class="nav-item__icon" aria-hidden="true">◆</span>
+            Dashboard
+          </button>
+          <button type="button" class="nav-item hidden" data-section="students" id="nav-students">
+            <span class="nav-item__icon" aria-hidden="true">▤</span>
+            Students
+          </button>
+          <button type="button" class="nav-item" data-section="profile">
+            <span class="nav-item__icon" aria-hidden="true">◎</span>
+            Profile
+          </button>
+          <button type="button" class="nav-item hidden" data-section="monitoring" id="nav-monitoring">
+            <span class="nav-item__icon" aria-hidden="true">◉</span>
+            Monitoring
+          </button>
+        </nav>
+        <div class="sidebar__footer">
+          <p class="sidebar__hint text-muted text-xs">API: <code class="code-inline">localhost:8000</code></p>
+        </div>
+      </aside>
+
+      <div class="app-main">
+        <header class="top-header">
+          <button type="button" class="icon-btn sidebar-toggle" id="btn-sidebar-toggle" aria-label="Toggle menu">
+            ☰
+          </button>
+          <div class="top-header__titles">
+            <h1 class="page-title" id="page-title">Dashboard</h1>
+            <p class="page-subtitle text-muted text-sm" id="page-subtitle">Overview and tools</p>
+          </div>
+          <div class="top-header__actions">
+            <span class="user-pill" id="user-pill"></span>
+            <button type="button" class="btn btn--ghost btn--sm" id="btn-logout">Log out</button>
+          </div>
+        </header>
+
+        <div id="global-alert" class="alert alert--banner hidden" role="status"></div>
+
+        <main class="page-content">
+          <!-- Dashboard -->
+          <section id="page-dashboard" class="page-section">
+            <div id="alert-dashboard" class="alert hidden" role="alert"></div>
+
+            <div id="dashboard-student" class="hidden">
+              <div class="card card--hero">
+                <h2 class="card__title">Hello</h2>
+                <p class="text-muted" id="dashboard-student-welcome"></p>
+                <p class="text-sm text-muted">
+                  As a student you can review your profile and linked academic record. Administrative
+                  tools stay hidden.
+                </p>
+              </div>
+            </div>
+
+            <div id="dashboard-admin" class="hidden">
+              <div class="grid-stats" id="dashboard-stat-cards"></div>
+              <div class="card hidden" id="dashboard-monitoring-preview">
+                <h3 class="card__title card__title--sm">Monitoring snapshot</h3>
+                <p class="text-muted text-xs">From <code class="code-inline">GET /monitoring/metrics</code>. Open Monitoring for full JSON.</p>
+                <div class="metrics-summary" id="dashboard-metrics-chips"></div>
+                <button type="button" class="btn btn--secondary btn--sm" id="btn-goto-monitoring">Open monitoring</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Students (admin) -->
+          <section id="page-students" class="page-section hidden">
+            <div class="section-head">
+              <div>
+                <h2 class="section-title">Students</h2>
+                <p class="text-muted text-sm">List, filter, and manage records (admin only).</p>
+              </div>
+              <button type="button" class="btn btn--primary" id="btn-add-student">Add student</button>
+            </div>
+            <div id="alert-students" class="alert hidden" role="alert"></div>
+
+            <div class="card">
+              <h3 class="card__title card__title--sm">Filters</h3>
+              <p class="text-muted text-xs">
+                Query params match the API: <code class="code-inline">department</code>,
+                <code class="code-inline">gpa_min</code>, <code class="code-inline">gpa_max</code>,
+                <code class="code-inline">status</code>, <code class="code-inline">search</code>.
+              </p>
+              <div class="filters-grid">
+                <div class="field">
+                  <label class="field__label" for="filter-search">Search (name or university ID)</label>
+                  <input id="filter-search" class="field__input" type="text" placeholder="Contains…" />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="filter-department">Department (exact)</label>
+                  <input id="filter-department" class="field__input" type="text" />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="filter-status">Status</label>
+                  <select id="filter-status" class="field__input">
+                    <option value="">Any</option>
+                    <option value="active">active</option>
+                    <option value="graduated">graduated</option>
+                    <option value="suspended">suspended</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="filter-gpa-min">Min GPA</label>
+                  <input
+                    id="filter-gpa-min"
+                    class="field__input"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="4"
+                    placeholder="0–4"
+                  />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="filter-gpa-max">Max GPA</label>
+                  <input
+                    id="filter-gpa-max"
+                    class="field__input"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="4"
+                    placeholder="0–4"
+                  />
+                </div>
+                <div class="field field--actions">
+                  <span class="field__label">Actions</span>
+                  <div class="btn-row">
+                    <button type="button" class="btn btn--secondary" id="btn-apply-filters">Apply filters</button>
+                    <button type="button" class="btn btn--ghost" id="btn-reset-filters">Reset</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card card--table">
+              <div class="table-toolbar">
+                <span class="text-muted text-sm" id="students-loading" aria-live="polite"></span>
+                <div class="field field--inline">
+                  <label class="field__label" for="page-size">Page size</label>
+                  <select id="page-size" class="field__input field__input--narrow">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>University ID</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Department</th>
+                      <th>GPA</th>
+                      <th>Status</th>
+                      <th class="th-actions">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-students"></tbody>
+                </table>
+              </div>
+              <div class="pagination">
+                <button type="button" class="btn btn--secondary btn--sm" id="btn-page-prev">Previous</button>
+                <span class="pagination__label" id="page-label">Page 1</span>
+                <button type="button" class="btn btn--secondary btn--sm" id="btn-page-next">Next</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Profile -->
+          <section id="page-profile" class="page-section hidden">
+            <h2 class="section-title">Profile</h2>
+            <p class="text-muted text-sm">Data from <code class="code-inline">GET /users/me</code> and, for students, <code class="code-inline">GET /students/me</code>.</p>
+            <div id="alert-profile" class="alert hidden" role="alert"></div>
+            <div class="grid-2">
+              <div class="card" id="card-profile-user"></div>
+              <div class="card hidden" id="card-profile-student"></div>
+            </div>
+          </section>
+
+          <!-- Monitoring (admin) -->
+          <section id="page-monitoring" class="page-section hidden">
+            <h2 class="section-title">Monitoring</h2>
+            <p class="text-muted text-sm">Snapshot from <code class="code-inline">GET /monitoring/metrics</code>.</p>
+            <div id="alert-monitoring" class="alert hidden" role="alert"></div>
+            <div class="grid-2">
+              <div class="card">
+                <h3 class="card__title card__title--sm">Live metrics</h3>
+                <div id="metrics-summary" class="metrics-summary"></div>
+                <pre id="metrics-json" class="code-block" aria-label="Metrics JSON"></pre>
+              </div>
+              <div class="card">
+                <h3 class="card__title card__title--sm">HTML dashboard</h3>
+                <p class="text-muted text-sm">
+                  Opens the server-rendered dashboard in a new tab (same origin, includes auth cookie
+                  if any).
+                </p>
+                <a
+                  class="btn btn--secondary"
+                  href="http://localhost:8000/monitoring/dashboard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open monitoring dashboard</a
+                >
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- Modal: add / edit student -->
+    <div id="modal-student" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-student-title">
+      <div class="modal__backdrop" data-close-modal tabindex="-1"></div>
+      <div class="modal__dialog">
+        <div class="modal__head">
+          <h2 id="modal-student-title" class="modal__title">Add student</h2>
+          <button type="button" class="icon-btn" data-close-modal aria-label="Close">✕</button>
+        </div>
+        <form id="form-student" class="form-stack">
+          <input type="hidden" id="field-edit-id" value="" />
+          <div class="field">
+            <label class="field__label" for="field-user-id">User ID <span class="req">*</span></label>
+            <select id="field-user-id" class="field__input" required></select>
+            <p class="text-xs text-muted">Pulled from <code class="code-inline">GET /users/</code> (admin).</p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-university-id">University ID <span class="req">*</span></label>
+            <input id="field-university-id" class="field__input" type="text" required />
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-name">Full name <span class="req">*</span></label>
+            <input id="field-name" class="field__input" type="text" required />
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-department">Department <span class="req">*</span></label>
+            <input id="field-department" class="field__input" type="text" required />
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-enrollment">Enrollment date <span class="req">*</span></label>
+            <input id="field-enrollment" class="field__input" type="date" required />
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-gpa">GPA (0–4) <span class="req">*</span></label>
+            <input id="field-gpa" class="field__input" type="number" step="0.01" min="0" max="4" value="0" required />
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-status">Status</label>
+            <select id="field-status" class="field__input">
+              <option value="active">active</option>
+              <option value="graduated">graduated</option>
+              <option value="suspended">suspended</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-gender">Gender (optional)</label>
+            <input id="field-gender" class="field__input" type="text" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-phone">Phone (optional)</label>
+            <input id="field-phone" class="field__input" type="text" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="field-birth">Birth date (optional)</label>
+            <input id="field-birth" class="field__input" type="date" />
+          </div>
+          <div id="alert-modal-student" class="alert hidden" role="alert"></div>
+          <div class="modal__actions">
+            <button type="button" class="btn btn--ghost" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn--primary" id="btn-save-student">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: view student -->
+    <div id="modal-view-student" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal__backdrop" data-close-modal tabindex="-1"></div>
+      <div class="modal__dialog modal__dialog--narrow">
+        <div class="modal__head">
+          <h2 class="modal__title">Student details</h2>
+          <button type="button" class="icon-btn" data-close-modal aria-label="Close">✕</button>
+        </div>
+        <div id="view-student-body" class="detail-grid"></div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--secondary" data-close-modal>Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: confirm delete -->
+    <div id="modal-delete" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal__backdrop" data-close-modal tabindex="-1"></div>
+      <div class="modal__dialog modal__dialog--narrow">
+        <h2 class="modal__title">Delete student?</h2>
+        <p class="text-muted" id="delete-student-text"></p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" data-close-modal>Cancel</button>
+          <button type="button" class="btn btn--danger" id="btn-confirm-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
