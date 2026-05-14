@@ -1,321 +1,299 @@
-# 🎓 Student Management System API
+# 🎓 Student Management System
 
-A scalable and production-ready full-stack system built with **FastAPI** to manage university students, featuring secure authentication, role-based access control, advanced querying, caching, logging, monitoring, testing, and a modern Next.js frontend with i18n support.
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![Pytest](https://img.shields.io/badge/Tests-Pytest-0A9EDC?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 
----
+Professional full-stack university student management system built with FastAPI, PostgreSQL, Redis, and a static HTML/CSS/JavaScript frontend. The project supports secure JWT-based authentication, role-based access control, student CRUD operations, Redis-backed caching, audit-style application logging, and custom monitoring routes.
 
-## 🚀 Features
+## Features
 
-* 🔐 **JWT Authentication**
-  * Secure user registration & login
-  * Token-based authentication
+- JWT authentication with user registration and login.
+- Role-based access control for admin and student users.
+- Admin management for users and students.
+- Student profile access with partial self-updates where allowed.
+- Student CRUD operations with search, department, status, GPA range, skip/limit pagination.
+- Redis cache for student detail lookups, with invalidation after writes.
+- Application logging for create, update, and delete actions.
+- API validation and consistent error handling.
+- Custom monitoring metrics and HTML dashboard.
+- Dockerized backend, frontend, PostgreSQL, Redis, and Redis Commander.
 
-* 🛡 **Role-Based Authorization**
-  * Admin: full access
-  * Student: limited access (own profile only)
+## Tech Stack
 
-* 📚 **Student Management**
-  * Full CRUD operations
-  * Controlled profile access
+| Layer | Technology |
+| --- | --- |
+| Backend | FastAPI, Python 3.12, SQLAlchemy 2, Pydantic, Alembic |
+| Authentication | JWT with python-jose, password hashing with bcrypt |
+| Database | PostgreSQL 16 |
+| Cache | Redis 7 |
+| Frontend | Static HTML, CSS, Vanilla JavaScript served by Nginx |
+| Testing | Pytest |
+| Deployment | Docker, Docker Compose |
+| Monitoring | Custom FastAPI metrics and dashboard routes |
+| Redis UI | Redis Commander |
 
-* 🔍 **Advanced Querying**
-  * Filter by department, GPA, level
-  * Pagination support
+## Architecture Overview
 
-* ⚡ **Performance Optimization**
-  * Redis caching (Cache-Aside Pattern)
+The backend follows a modular FastAPI structure:
 
-* 📊 **Logging & Monitoring**
-  * API request & response logging
-  * Error tracking
-  * System health endpoints
-  * Monitoring dashboard & metrics API
+- `routes/` handles request/response flow and authorization.
+- `schemas/` validates input and output payloads.
+- `models/` defines SQLAlchemy database entities.
+- `db/` manages sessions, base models, and initialization.
+- `cache/` provides Redis access and cache management.
+- `middlewares/` adds logging middleware.
+- `monitoring/` exposes operational metrics and a dashboard.
+- `utils/` contains hashing, JWT, and logging helpers.
 
-* 🧾 **Audit Logging**
-  * Track updates with old/new values
+Request flow is straightforward: the frontend calls the FastAPI API, JWT tokens are attached as Bearer tokens, the API validates permissions, reads or writes PostgreSQL, and uses Redis for cached student data when available.
 
-* 🧪 **Testing**
-  * Full API testing using pytest
-  * Cache performance testing
+## Project Structure
 
-* 🖥 **Frontend (GUI)**
-  * Next.js interface with English & Arabic support (i18n)
-
----
-
-## 🏗 Architecture Overview
-
-The system follows a **clean modular architecture**:
-
-* **Routes** → Handle API endpoints
-* **Schemas** → Validate request & response data
-* **Models** → SQLAlchemy database models
-* **Cache** → Redis Cache-Aside integration
-* **Core** → Configurations & security
-* **Middleware** → Logging & request handling
-* **Monitoring** → Metrics collection & dashboard
-
----
-
-## 🛠 Tech Stack
-
-| Layer            | Technology                                       |
-| ---------------- | ------------------------------------------------ |
-| Backend          | Python 3.12, FastAPI, SQLAlchemy 2.x, Alembic    |
-| Database         | PostgreSQL 16                                    |
-| Cache            | Redis 7                                          |
-| Authentication   | JWT (python-jose), bcrypt                        |
-| Frontend         | Next.js 16, React 19, TypeScript, Tailwind CSS 4 |
-| i18n             | next-intl (English & Arabic)                     |
-| Testing          | Pytest                                           |
-| Containerization | Docker, Docker Compose                           |
-
----
-
-## 📂 Project Structure
-
-```bash
-student-management-api/
-├── backend/                      # FastAPI backend
-│   ├── app/                      # Application code
-│   │   ├── main.py               # Application entry point
-│   │   ├── core/config.py        # Settings & environment config
-│   │   ├── db/                   # Database session, base, init
-│   │   ├── models/               # SQLAlchemy models (User, Student)
-│   │   ├── schemas/              # Pydantic request/response schemas
-│   │   ├── routes/               # API endpoints (auth, users, students)
-│   │   ├── cache/                # Redis client & cache manager
-│   │   ├── middlewares/          # Logging middleware
-│   │   ├── monitoring/           # Metrics & dashboard
-│   │   └── utils/                # Logger utilities
-│   ├── alembic/                  # Database migrations
-│   ├── scripts/                  # Seed data & test scripts
-│   ├── tests/                    # Pytest test suite
-│   ├── Dockerfile                # Backend Docker image
-│   ├── requirements.txt          # Python dependencies
-│   ├── .env.example              # Environment variable template
-│   └── alembic.ini               # Alembic configuration
-├── frontend/                     # Next.js frontend application
-├── docs/                         # Project documentation & API spec
-├── docker-compose.yml            # Full-stack Docker orchestration
+```text
+Student-Management-System/
+├── backend/
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── core/
+│   │   ├── db/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── routes/
+│   │   ├── cache/
+│   │   ├── middlewares/
+│   │   ├── monitoring/
+│   │   └── utils/
+│   ├── alembic/
+│   ├── scripts/
+│   ├── tests/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── .env.example
+├── frontend/
+│   ├── index.html
+│   ├── styles.css
+│   ├── app.js
+│   ├── Dockerfile
+│   └── nginx.conf
+├── docs/
+├── docker-compose.yml
 └── README.md
 ```
 
----
+## Run with Docker
 
-## ⚙️ Installation & Setup
-
-### Prerequisites
-
-Make sure you have the following installed:
-
-* Git
-* Docker and Docker Compose
-* Node.js 18+ and npm (for manual frontend setup)
-
----
-
-## 🐳 Run with Docker (Recommended)
-
-Docker Compose will start PostgreSQL, Redis, and the FastAPI server all together.
-
-**1. Clone the Repository**
-
-```bash
-git clone https://github.com/your-username/student-management-api.git
-cd student-management-api
-```
-
-**2. Start All Services**
+1. Make sure Docker and Docker Compose are installed.
+2. From the project root, start the full stack:
 
 ```bash
 docker compose up --build
 ```
 
-This will automatically:
+The backend container runs database migrations automatically before starting Uvicorn with:
 
-* Start PostgreSQL on port 5432
-* Start Redis on port 6379
-* Run database migrations
-* Start the API server on port 8000
-* Start the frontend on port 3000
+```bash
+alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+```
 
----
+## Stop Docker
 
-## 🖥 Manual Setup (Development)
+```bash
+docker compose down
+```
 
-### 1) Backend Setup
+To stop the stack and remove volumes as well:
+
+```bash
+docker compose down -v
+```
+
+## Rebuild Containers
+
+```bash
+docker compose up -d --build
+```
+
+## View Logs
+
+```bash
+docker compose logs -f api
+```
+
+Useful companion command:
+
+```bash
+docker compose ps
+```
+
+## Run Backend Manually
 
 ```bash
 cd backend
-
-# Create and activate virtual environment
 python -m venv .venv
-
-# Windows:
 .venv\Scripts\activate
-# Mac/Linux:
-source .venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
-```
-
-### 2) Configure Environment Variables
-
-Copy `.env.example` to `.env` and update the values:
-
-```env
-DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/db_name
-SECRET_KEY=your_secret_key
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-REDIS_URL=redis://localhost:6379/0
-BACK_END_ALLOWED_ORIGINS=http://localhost:3000
-LOG_LEVEL=INFO
-CACHE_DEFAULT_TTL_SECONDS=60
-APP_NAME=Student Management API
-```
-
-### 3) Run Database Migrations
-
-```bash
+Copy-Item .env.example .env
 alembic upgrade head
+uvicorn app.main:app --reload --port 8000
 ```
 
-### 4) Start the Backend
+On Windows PowerShell, use:
 
-```bash
-uvicorn app.main:app --reload
+```powershell
+.venv\Scripts\Activate.ps1
 ```
 
-### 5) Frontend Setup
+## Run Frontend Manually
+
+The frontend is a static site with no npm dependencies. Serve the `frontend/` folder with any static server, for example:
 
 ```bash
 cd frontend
-npm install
-npm run dev
+python -m http.server 3000
 ```
 
----
+Then open `http://localhost:3000` in your browser.
 
-## 🔑 Default Credentials
+## Environment Variables
 
-| Role    | Email               | Password    |
-| ------- | ------------------- | ----------- |
-| Admin   | admin@example.com   | admin123    |
-| Student | student@example.com | password123 |
+Backend configuration is loaded from `backend/.env` and the provided example file.
 
-> If running manually, seed the database first: `python scripts/seed_data.py`
+| Variable | Purpose | Example / Default |
+| --- | --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql+psycopg://postgres:password@localhost:5432/student_management` |
+| `REDIS_URL` | Redis connection string | `redis://localhost:6379/0` |
+| `LOG_LEVEL` | Application log level | `INFO` |
+| `CACHE_DEFAULT_TTL_SECONDS` | Default cache TTL in seconds | `60` |
+| `APP_NAME` | FastAPI app title | `Student Management API` |
+| `SECRET_KEY` | JWT signing secret | Set a strong random value |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT expiry in minutes | `30` |
+| `JWT_ALGORITHM` | JWT algorithm | `HS256` |
+| `BACK_END_ALLOWED_ORIGINS` | Allowed CORS origins | `http://localhost:3000` |
 
----
+Optional seed variables used by `backend/scripts/seed_data.py` are also defined in `backend/.env.example`.
 
-## 🌐 Accessing the Application
+## API Endpoints Summary
 
-| Service              | URL                                        |
-| -------------------- | ------------------------------------------ |
-| Frontend             | http://localhost:3000                      |
-| API Root             | http://localhost:8000                      |
-| Swagger Docs         | http://localhost:8000/docs                 |
-| ReDoc                | http://localhost:8000/redoc                |
-| Monitoring Dashboard | http://localhost:8000/monitoring/dashboard |
-| Monitoring Metrics   | http://localhost:8000/monitoring/metrics   |
+### Authentication
 
----
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| POST | `/auth/register` | Register a new user. Public registration creates a student user. |
+| POST | `/auth/login` | Log in and receive a JWT access token. |
 
-## 🔗 API Endpoints (Examples)
+### Users
 
-| Method | Endpoint       | Description       |
-| ------ | -------------- | ----------------- |
-| POST   | /auth/register | Register user     |
-| POST   | /auth/login    | Login             |
-| GET    | /students      | Get all students  |
-| GET    | /students/{id} | Get student by ID |
-| POST   | /students      | Create student    |
-| PUT    | /students/{id} | Update student    |
-| DELETE | /students/{id} | Delete student    |
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/users/me` | Get the authenticated user profile. |
+| GET | `/users/` | List all users. Admin only. |
+| POST | `/users/` | Create a user. Admin only. |
+| PUT | `/users/me/email` | Update the current user email. |
+| PUT | `/users/me/password` | Update the current user password. |
+| DELETE | `/users/{user_id}` | Delete a user. Admin only. |
 
----
+### Students
 
-## 🧪 Running Tests
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/students/` | List students with search, department, status, GPA range, skip, and limit. Admin only. |
+| POST | `/students/` | Create a student record. |
+| GET | `/students/me` | Get the authenticated user’s student profile. |
+| GET | `/students/{student_id}` | Get a student by ID. |
+| PATCH | `/students/{student_id}` | Partially update a student record. |
+| DELETE | `/students/{student_id}` | Delete a student record. Admin only. |
+| GET | `/students/stats/summary` | Get student statistics summary. Admin only. |
+
+### Monitoring
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/monitoring/metrics` | Return current API metrics as JSON. |
+| GET | `/monitoring/dashboard` | Open the HTML monitoring dashboard. |
+
+### Root
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/` | Health-style root response confirming the API is running. |
+
+## Authentication Flow
+
+1. Register or log in through `/auth/register` or `/auth/login`.
+2. The API returns a JWT access token on successful login.
+3. The frontend stores the token in `localStorage` and sends it as `Authorization: Bearer <token>`.
+4. The API resolves the current user through `/users/me` and uses the user role for access control.
+5. Admin users can manage users and students; student users can access their own account and student profile data.
+
+## Default Local URLs
+
+| Service | URL |
+| --- | --- |
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8000 |
+| Swagger UI | http://localhost:8000/docs |
+| ReDoc | http://localhost:8000/redoc |
+| Redis Commander | http://localhost:8081 |
+| PostgreSQL | localhost:5433 |
+| Redis | localhost:6379 |
+
+## Testing
+
+Run the test suite from the backend directory:
 
 ```bash
 cd backend
-
-# Run all tests
 pytest
-
-# Run a specific test file
-pytest tests/test_students.py
-
-# Run cache performance test
-python scripts/test_cache_performance.py
 ```
 
----
-
-## 🗄 Alembic Migrations
+If you are using Docker Compose, run:
 
 ```bash
-cd backend
-
-# Apply all pending migrations
-alembic upgrade head
-
-# Create a new migration
-alembic revision --autogenerate -m "describe your changes"
-
-# Rollback one migration
-alembic downgrade -1
-
-# View migration history
-alembic history
+docker compose exec api pytest
 ```
 
----
+## Useful Docker Commands
 
-## 🌍 Environment Variables Reference
+```bash
+docker compose up --build
+docker compose up -d --build
+docker compose down
+docker compose down -v
+docker compose logs -f api
+docker compose ps
+docker compose exec api alembic upgrade head
+docker compose exec api pytest
+docker compose exec api python scripts/seed_data.py
+```
 
-| Variable                      | Description                        | Default / Example                        |
-| ----------------------------- | ---------------------------------- | ---------------------------------------- |
-| `DATABASE_URL`                | PostgreSQL connection string       | `postgresql+psycopg://user:pass@host/db` |
-| `REDIS_URL`                   | Redis connection string            | `redis://localhost:6379/0`               |
-| `SECRET_KEY`                  | JWT signing secret                 | *(generate a strong random string)*      |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token expiration time in minutes   | `30`                                     |
-| `JWT_ALGORITHM`               | JWT signing algorithm              | `HS256`                                  |
-| `BACK_END_ALLOWED_ORIGINS`    | CORS allowed origins               | `http://localhost:3000`                  |
-| `LOG_LEVEL`                   | Logging level                      | `INFO`                                   |
-| `CACHE_DEFAULT_TTL_SECONDS`   | Default cache TTL in seconds       | `60`                                     |
-| `APP_NAME`                    | Application name shown in docs     | `Student Management API`                 |
+## Troubleshooting
 
----
+- If the frontend cannot reach the API, confirm the backend is running on `http://localhost:8000` and that `BACK_END_ALLOWED_ORIGINS` includes the frontend origin.
+- If database tables are missing, run `alembic upgrade head` or `docker compose exec api alembic upgrade head`.
+- If a container fails during startup, check `docker compose logs -f api` for migration or connection errors.
+- If port bindings fail, make sure ports `3000`, `8000`, `5433`, `6379`, and `8081` are free on your machine.
+- If Redis cache behavior seems stale, remember that student detail and list caches are invalidated after student create, update, and delete operations.
 
-## 📌 Best Practices
+## Notes for University Submission
 
-* Follow modular architecture
-* Use environment variables for secrets
-* Validate all inputs using Pydantic
-* Apply role-based access strictly
-* Use caching for performance optimization
-* Ensure full test coverage
+- The backend is FastAPI-based and the frontend is intentionally static, so do not describe it as React or Next.js.
+- Include your `.env` file locally, but do not commit secrets.
+- The Docker Compose setup is the most reliable way to demonstrate the full stack during presentation.
+- If you seed sample data, run `docker compose exec api python scripts/seed_data.py` after the services are up.
+- Swagger UI and the monitoring dashboard are useful for demos because they show both the API and the operational views.
 
----
+## Future Improvements
 
-## 👥 Team Contributions
+- Add richer reporting and more student analytics.
+- Expand automated tests for cache invalidation and monitoring behavior.
+- Add stricter validation and finer-grained field-level permissions where needed.
+- Improve the monitoring dashboard with charts and historical trends.
+- Add production deployment notes for a hosted environment.
 
-| Scope |
-| ----- |
-| Backend Core — project setup, database design, models, migrations, auth, CRUD endpoints |
-| Caching + Logging + Monitoring — Redis integration, structured logging, monitoring dashboard |
+## License
 
----
-
-## 📄 License
-
-This project is for educational purposes.
-
----
-
-## ⭐ Project Value
-
-This project demonstrates a **real-world full-stack system design** including authentication, authorization, caching, logging, monitoring, testing, i18n, and scalable architecture — making it highly suitable for production-level learning and portfolio presentation.
+This project is intended for educational and university submission use.
